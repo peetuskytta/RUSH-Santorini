@@ -7,6 +7,30 @@ BLOCK_SIZE = 150
 GREEN = (50,205,50)
 WHITE = (250, 250, 250)
 
+class GameState:
+    PLACE_WORKERS = 0
+    MID_GAME = 1
+    GAMEOVER = 2
+    def __init__(self):
+        self.phase = GameState.PLACE_WORKERS
+        self.number_of_players = 2
+        self.turn = 0
+
+class Cell:
+    EMPTY = 0
+    def __init__(self):
+        self.state = Cell.EMPTY
+
+class Grid:
+    def __init__(self):
+        self.grid = []
+        for i in range(0, 5):
+            row = []
+            for j in range(0, 5):
+                row.append(Cell())
+            self.grid.append(row)
+        print(self.grid)
+
 def draw_grid():
     for x in range(0, WINDOW_WIDTH, BLOCK_SIZE):
         for y in range(0, WINDOW_HEIGHT, BLOCK_SIZE):
@@ -17,6 +41,8 @@ def main():
     global SCREEN, CLOCK
     print("Enter team name:")
     name = input()
+    gamestate = GameState()
+    grid = Grid()
     pygame.init()
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     CLOCK = pygame.time.Clock()
