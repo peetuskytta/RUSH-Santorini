@@ -31,6 +31,14 @@ class Grid:
             self.grid.append(row)
         print(self.grid)
 
+# Start menu which returns true until clicked START button
+def start_menu():
+    pass
+
+# Creating a button to click and start game after names have been given
+def create_button():
+    pass
+
 def draw_grid():
     for x in range(0, WINDOW_WIDTH, BLOCK_SIZE):
         for y in range(0, WINDOW_HEIGHT, BLOCK_SIZE):
