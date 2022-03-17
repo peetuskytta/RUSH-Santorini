@@ -1,73 +1,120 @@
 import pygame
 from pygame.locals import *
 
+# Sizes in pixels
 WINDOW_HEIGHT = 750
 WINDOW_WIDTH = 750
 BLOCK_SIZE = 150
+res = (750, 750)
+
+# Colors
 GREEN = (50,205,50)
 WHITE = (250, 250, 250)
+DARK = (100, 100, 100)
+LIGHTER = (50, 205, 140)
+
+
 
 class GameState:
-    PLACE_WORKERS = 0
-    MID_GAME = 1
-    GAMEOVER = 2
-    def __init__(self):
-        self.phase = GameState.PLACE_WORKERS
-        self.number_of_players = 2
-        self.turn = 0
+	PLACE_WORKERS = 0
+	MID_GAME = 1
+	GAMEOVER = 2
+	def __init__(self):
+		self.phase = GameState.PLACE_WORKERS
+		self.number_of_players = 2
+		self.turn = 0
 
 class Cell:
-    EMPTY = 0
-    def __init__(self):
-        self.state = Cell.EMPTY
+	EMPTY = 0
+	def __init__(self):
+		self.state = Cell.EMPTY
 
 class Grid:
-    def __init__(self):
-        self.grid = []
-        for i in range(0, 5):
-            row = []
-            for j in range(0, 5):
-                row.append(Cell())
-            self.grid.append(row)
-        print(self.grid)
+	def __init__(self):
+		self.grid = []
+		for i in range(0, 5):
+			row = []
+			for j in range(0, 5):
+				row.append(Cell())
+			self.grid.append(row)
+		print(self.grid)
 
 # Start menu which returns true until clicked START button
 def start_menu():
-    pass
+
+	# menu background
+	background = pygame.image.load('santorini_background.jpg')
+
+	# Fonts
+	smallfont = pygame.font.SysFont('Corbel',35)
+	largefont = pygame.font.SysFont('Corbel',70)
+
+	# Texts
+	start_button = smallfont.render('Start', True, WHITE)
+	q_button = smallfont.render('Quit', True, WHITE)
+
+	# Screen size
+	width = SCREEN.get_width()
+	height = SCREEN.get_height()
+
+	while True:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				if width/2 <= mouse[0] <= width/2+110 and height/2 <= mouse[1] <= height/2+40:
+					pygame.quit()
+				if width/2 <= mouse[0] <= width/2+110 and height/2-60 <= mouse[1] <= height/2+40:
+					return()
+		SCREEN.blit(background, (0, 0))
+
+		mouse = pygame.mouse.get_pos()
+		if width/2 <= mouse[0] <= width/2+110 and height/2 <= mouse[1] <= height/2+40:
+			pygame.draw.rect(SCREEN, LIGHTER, [width/2, height/2, 110, 40])
+		else:
+			pygame.draw.rect(SCREEN, DARK, [width/2, height/2, 110, 40])
+		SCREEN.blit(q_button, (width/2+25, height/2))
+
+		SCREEN.blit(start_button, (width/2+25, height/2-60))
+		pygame.display.update()
 
 # Creating a button to click and start game after names have been given
+# CARL!!?!?!? I think it's better to create a uniform button below that can be used all around the menu, right?
 def create_button():
-    pass
+	pass
 
 def draw_grid():
-    for x in range(0, WINDOW_WIDTH, BLOCK_SIZE):
-        for y in range(0, WINDOW_HEIGHT, BLOCK_SIZE):
-            rect = pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
-            pygame.draw.rect(SCREEN, WHITE, rect, 1)
+	for x in range(0, WINDOW_WIDTH, BLOCK_SIZE):
+		for y in range(0, WINDOW_HEIGHT, BLOCK_SIZE):
+			rect = pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
+			pygame.draw.rect(SCREEN, WHITE, rect, 1)
 
 def main():
-    global SCREEN, CLOCK
-    print("Enter team name:")
-    name = input()
-    gamestate = GameState()
-    grid = Grid()
-    pygame.init()
-    SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    CLOCK = pygame.time.Clock()
-    SCREEN.fill(GREEN)
+	global SCREEN, CLOCK
+#	print("Enter team name:")
+#	name = input()
+	gamestate = GameState()
+	grid = Grid()
+	pygame.init()
+	SCREEN = pygame.display.set_mode(res)
+	SCREEN.fill((0, 0, 0))
+	#SCREEN.blit(background, (0, 0))
+	CLOCK = pygame.time.Clock()
+	
+	while True:
+		start_menu()
+# IDK how to return after clicking START in menu... yet.
+		draw_grid()
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				sys.exit()
+			elif event.type == KEYDOWN:
+				if event.key == K_ESCAPE:
+					pygame.quit()
+					return
 
-    while True:
-        draw_grid()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    pygame.quit()
-                    return
-
-        pygame.display.update()
+		pygame.display.update()
 
 if __name__ == "__main__":
-    main()
+	main()
