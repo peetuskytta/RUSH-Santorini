@@ -129,9 +129,12 @@ def main():
 	
 	start_menu()
 	SCREEN.fill(WHITE)
-	
+	sidebar = pygame.image.load('sidebar.jpg')
+	img_sidebar = pygame.transform.scale(sidebar,(200,750))
+
 	while True:
 		draw_grid(grid)
+		SCREEN.blit(img_sidebar, (751, 0))
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
