@@ -42,13 +42,18 @@ class GameState:
 		self.number_of_players = 2
 		self.turn = 0
 		self.current_player = 1
-		#self.players == [Player(), Player()]
+		self.winner = None
 
 	def next_turn(self):
 		self.turn += 1
 		self.current_player += 1
 		if self.current_player > self.number_of_players:
 			self.current_player = 1
+	
+	def opposite_player(self, player):
+		if player == 1:
+			return 2
+		return 1
 
 class Cell:
 	def __init__(self, row, col):
@@ -125,14 +130,43 @@ class Grid:
 		self.grid[worker_row][worker_col].occupied_by = 0
 		self.grid[new_row][new_col].occupied_by = player
 
+	def get_adjacents(self, rowcol):
+		adjacents = []
+		center_row, center_col = rowcol
+		for row in range(center_row - 1, center_row + 3):
+			for col in range (center_col - 1, center_col + 3):
+				print(row, 'and', col)
+				if row < 0 or row > 4 or col < 0 or col > 4:
+					continue
+				adjacents.append(self.get_cell(row, col))
+		return adjacents
+
+	def get_worker_cells(self, player):
+		workers = []
+		for row in self.grid:
+			for cell in row:
+				if cell.occupied_by == player:
+					workers.append(cell)
+		return tuple(workers)
 
 def end_game(end_player):
-    pass
-
-    winner = largefont.render('PLAYER XX WINS', True, DARK)
-    #state = pygame.mouse.get_pressed()
-    SCREEN.blit(winner, (width/2, height/2))
-
+	largefont = pygame.font.SysFont('Corbel',100)
+	if end_player == 1:
+		winner = largefont.render("PLAYER 1 WINS", True, DARK)
+	else:
+		winner = largefont.render("PLAYER 2 WINS", True, DARK)
+	while True:
+		SCREEN.fill(WHITE)
+		SCREEN.blit(winner, (WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				sys.exit()
+			elif event.type == KEYDOWN:
+				if event.key == K_ESCAPE:
+					pygame.quit()
+					sys.exit()
+		pygame.display.update()
 
 
 # Start menu which returns true until clicked START button
@@ -180,7 +214,7 @@ def get_cell_color(occupied_by):
 	else:
 		return GREEN
 
-def draw_grid(grid):
+def draw_grid(grid, gamestate):
 	smallfont = pygame.font.SysFont('Corbel',35)
 	y = 0
 	for row in range(0, 5):
@@ -188,14 +222,13 @@ def draw_grid(grid):
 		for col in range(0, 5):
 			cell = grid.grid[row][col]
 			color = get_cell_color(cell.occupied_by)
-			#rect = pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
 			surface = pygame.Surface((BLOCK_SIZE - 8, BLOCK_SIZE - 8))
 			surface.fill(color)
 			SCREEN.blit(surface, (x + 4, y + 4))
 			height_text = smallfont.render(str(cell.height), True, WHITE)
 			SCREEN.blit(height_text, (x + 75, y + 75))
-			#overlay = pygame.Surface((BLOCK_SIZE - 16, BLOCK_SIZE - 16))
-			#pygame.draw.rect(SCREEN, color, rect, 1)
+			if gamestate.phase == GameState.GAMEOVER:
+				end_game(gamestate.winner)
 			x += BLOCK_SIZE
 		y += BLOCK_SIZE
 
@@ -204,6 +237,19 @@ def xy_to_rowcol(xy):
 	row = y // BLOCK_SIZE
 	col = x // BLOCK_SIZE
 	return (row, col)
+
+def has_valid_moves(player, grid):
+	worker_1, worker_2 = grid.get_worker_cells(player)
+	print("workers", worker_1.get_rowcol(), worker_2.get_rowcol())
+	for cell in grid.get_adjacents(worker_1.get_rowcol()):
+		print("1 cell", cell.get_rowcol())
+		if is_valid_move(worker_1, cell):
+			return True
+	for cell in grid.get_adjacents(worker_2.get_rowcol()):
+		print("2 cell", cell.get_rowcol())
+		if is_valid_move(worker_2, cell):
+			return True
+	return False
 
 def main():
 	global SCREEN, CLOCK
@@ -222,7 +268,7 @@ def main():
 	img_sidebar = pygame.transform.scale(sidebar,(200,750))
 
 	while True:
-		draw_grid(grid)
+		draw_grid(grid, gamestate)
 		SCREEN.blit(img_sidebar, (751, 0))
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -231,18 +277,29 @@ def main():
 			elif event.type == KEYDOWN:
 				if event.key == K_ESCAPE:
 					start_menu()
+					SCREEN.fill(WHITE)
+					command = Command()
+					workers_placed = 0
+					grid = Grid()
+					gamestate = GameState()
 			if event.type == pygame.MOUSEBUTTONUP:
 				pos = pygame.mouse.get_pos()
 				row, col = xy_to_rowcol(pos)
 				if gamestate.phase == GameState.PLACE_WORKERS:
-					grid.grid[row][col].occupied_by = gamestate.current_player
-					workers_placed += 1
-					if workers_placed == 2:
-						gamestate.next_turn()
-						if gamestate.current_player == 1:
-							gamestate.phase = GameState.MIDGAME
-						workers_placed = 0
+					if grid.get_cell(row, col).occupied_by == 0:
+						grid.grid[row][col].occupied_by = gamestate.current_player
+						workers_placed += 1
+						if workers_placed == 2:
+							gamestate.next_turn()
+							if gamestate.current_player == 1:
+								gamestate.phase = GameState.MIDGAME
+							workers_placed = 0
 				if gamestate.phase == GameState.MIDGAME:
+					if not has_valid_moves(gamestate.current_player, grid):
+						print("no moves left")
+						gamestate.phase == GameState.GAMEOVER
+						gamestate.winner == gamestate.opposite_player(gamestate.current_player)
+						end_game(gamestate.winner)
 					if command.stage == Command.SELECT_WORKER:
 						if grid.has_worker_at(row, col, gamestate.current_player):
 							command.from_cell = grid.get_cell(row, col)
@@ -252,8 +309,12 @@ def main():
 							command.to_cell = grid.get_cell(row, col)
 							grid.update_with_command(command)
 							if command.to_cell.has_winner():
-								print("GAME OVER")
+								gamestate.phase == GameState.GAMEOVER
+								gamestate.winner == command.to_cell.occupied_by
+								end_game(gamestate.winner)
 							command.next_stage()
+						else:
+							command = Command()
 					elif command.stage == Command.BUILD:
 						command.build_cell = grid.get_cell(row, col)
 						if is_valid_build(command.build_cell, command.to_cell):
@@ -261,6 +322,12 @@ def main():
 							gamestate.next_turn()
 							command = Command()
 		pygame.display.update()
+
+#TODO
+# game over when no valid moves
+# game over text
+# new game after esc
+# placing worker on prev worker
 
 if __name__ == "__main__":
 	main()
