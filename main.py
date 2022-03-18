@@ -74,10 +74,17 @@ class Cell:
 		if self.row == other.row + 1 and self.col == other.col + 1: return True
 		return False
 
+	def has_winner(self):
+		if self.height != 3:
+			return False
+		if self.occupied_by == 0:
+			return False
+		return True
+
 def is_valid_move(from_cell, to_cell):
 	if to_cell.height >= 4:
 		return False
-	if from_cell.occupied_by != 0:
+	if to_cell.occupied_by != 0:
 		return False
 	if to_cell.height > from_cell.height + 1:
 		return False
@@ -241,9 +248,11 @@ def main():
 							command.from_cell = grid.get_cell(row, col)
 							command.next_stage()
 					elif command.stage == Command.MOVE:
-						if is_valid_move(grid.get_cell(row, col), command.from_cell):
+						if is_valid_move(command.from_cell, grid.get_cell(row, col)):
 							command.to_cell = grid.get_cell(row, col)
 							grid.update_with_command(command)
+							if command.to_cell.has_winner():
+								print("GAME OVER")
 							command.next_stage()
 					elif command.stage == Command.BUILD:
 						command.build_cell = grid.get_cell(row, col)
