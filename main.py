@@ -31,7 +31,7 @@ class Command:
 	SELECT_CELL = 2
 	def __init__(self):
 		self.stage = Command.SELECT_WORKER
-		self.worker = None
+		self.worker_cell = None
 		self.action = Action.NONE
 		self.cell = None
 
@@ -55,9 +55,40 @@ class GameState:
 			self.current_player = 1
 
 class Cell:
-	def __init__(self):
+	def __init__(self, row, col):
+		self.row = row
+		self.col = col
 		self.height = 0
 		self.occupied_by = 0
+
+	def get_rowcol(self):
+		return (self.row, self.col)
+
+	def get_player(self):
+		return (self.occupied_by)
+
+	def is_adjacent(self, other):
+		if self.row == other.row - 1 and self.col == other.col - 1: return True
+		if self.row == other.row - 1 and self.col == other.col: return True
+		if self.row == other.row - 1 and self.col == other.col + 1: return True
+		if self.row == other.row and self.col == other.col - 1: return True
+		if self.row == other.row and self.col == other.col + 1: return True
+		if self.row == other.row + 1 and self.col == other.col - 1: return True
+		if self.row == other.row + 1 and self.col == other.col: return True
+		if self.row == other.row + 1 and self.col == other.col + 1: return True
+		return False
+
+def is_valid_move(from_cell, to_cell):
+	if from_cell.occupied_by != 0:
+		return False
+	if to_cell.height > from_cell.height + 1:
+		return False
+	if not to_cell.is_adjacent(from_cell):
+		return False
+	return True
+
+def is_valid_build(self, build_cell, worker_cell, player):
+	pass
 
 class Grid:
 	def __init__(self):
@@ -65,22 +96,21 @@ class Grid:
 		for i in range(0, 5):
 			row = []
 			for j in range(0, 5):
-				row.append(Cell())
+				row.append(Cell(i, j))
 			self.grid.append(row)
 	
+	def get_cell(self, row, col):
+		return self.grid[row][col]
+
 	def has_worker_at(self, row, col, current_player):
 		if self.grid[row][col].occupied_by == current_player:
 			return True
 		return False
 
-	def is_valid_move(self, row, col, current_player):
-		if self.grid[row][col].occupied_by == 0:
-			return True
-		return False
-
 	def update_with_command(self, command):
-		worker_row, worker_col, player = command.worker
-		new_row, new_col = command.cell
+		worker_row, worker_col = command.worker_cell.get_rowcol()
+		new_row, new_col = command.cell.get_rowcol()
+		player = command.worker_cell.get_player()
 		self.grid[worker_row][worker_col].occupied_by = 0
 		self.grid[new_row][new_col].occupied_by = player
 
@@ -202,20 +232,16 @@ def main():
 				if gamestate.phase == GameState.MIDGAME:
 					if command.stage == Command.SELECT_WORKER:
 						if grid.has_worker_at(row, col, gamestate.current_player):
-							command.worker = (row, col, gamestate.current_player)
+							command.worker_cell = grid.get_cell(row, col)
 							command.action = Action.MOVE
 							command.next_stage()
 							command.next_stage()
 					elif command.stage == Command.SELECT_CELL:
-						if grid.is_valid_move(row, col, gamestate.current_player):
-							command.cell = (row, col)
+						if is_valid_move(grid.get_cell(row, col), command.worker_cell):
+							command.cell = grid.get_cell(row, col)
 							grid.update_with_command(command)
 							command = Command()
 							gamestate.next_turn()
-
-
-
-
 
 		pygame.display.update()
 
