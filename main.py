@@ -101,8 +101,9 @@ def main():
 	#SCREEN.blit(background, (0, 0))
 	CLOCK = pygame.time.Clock()
 	
+	start_menu()
+	SCREEN.fill(GREEN)
 	while True:
-		start_menu()
 # IDK how to return after clicking START in menu... yet.
 		draw_grid()
 		for event in pygame.event.get():
