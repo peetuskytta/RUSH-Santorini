@@ -44,6 +44,15 @@ class Grid:
 				row.append(Cell())
 			self.grid.append(row)
 
+def end_game(end_player):
+    pass
+    
+    winner = largefont.render('PLAYER XX WINS', True, DARK)
+    #state = pygame.mouse.get_pressed()
+    SCREEN.blit(winner, (width/2, height/2))
+
+
+
 # Start menu which returns true until clicked START button
 def start_menu():
 
@@ -53,7 +62,7 @@ def start_menu():
 
 	# Fonts
 	smallfont = pygame.font.SysFont('Corbel',35)
-	largefont = pygame.font.SysFont('Corbel',70)
+	largefont = pygame.font.SysFont('Corbel',100)
 
 	# Texts
 	start_button = smallfont.render('Start', True, WHITE)
@@ -76,13 +85,6 @@ def start_menu():
 		SCREEN.blit(img, (0, 0))
 
 		mouse = pygame.mouse.get_pos()
-#		if width/2 <= mouse[0] <= width/2+110 and height/2 <= mouse[1] <= height/2+40:
-#			pygame.draw.rect(SCREEN, (0, 0, 0),[385, 450, 200, 70])
-#		else:
-#			pygame.draw.rect(SCREEN, (0, 0, 0), [385, 600, 200, 70])
-#		SCREEN.blit(q_button, (width/2+25, height/2))
-#
-#		SCREEN.blit(start_button, (width/2+25, height/2-60))
 		pygame.display.update()
 
 def create_button():
@@ -151,7 +153,6 @@ def main():
 			if event.type == pygame.MOUSEBUTTONUP:
 				pos = pygame.mouse.get_pos()
 				row, col = xy_to_rowcol(pos)
-				clicked = True
 		if clicked and gamestate.phase == GameState.PLACE_WORKERS:
 			grid.grid[row][col].occupied_by = gamestate.current_player
 			workers_placed += 1
