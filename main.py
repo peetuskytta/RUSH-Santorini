@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from enum import Enum
+import sys
 
 # Sizes in pixels
 WINDOW_HEIGHT = 750
@@ -42,7 +43,7 @@ class GameState:
 		self.number_of_players = 2
 		self.turn = 0
 		self.current_player = 1
-		self.winner = None
+		self.winner = 0
 
 	def next_turn(self):
 		self.turn += 1
@@ -135,7 +136,6 @@ class Grid:
 		center_row, center_col = rowcol
 		for row in range(center_row - 1, center_row + 3):
 			for col in range (center_col - 1, center_col + 3):
-				print(row, 'and', col)
 				if row < 0 or row > 4 or col < 0 or col > 4:
 					continue
 				adjacents.append(self.get_cell(row, col))
@@ -240,13 +240,10 @@ def xy_to_rowcol(xy):
 
 def has_valid_moves(player, grid):
 	worker_1, worker_2 = grid.get_worker_cells(player)
-	print("workers", worker_1.get_rowcol(), worker_2.get_rowcol())
 	for cell in grid.get_adjacents(worker_1.get_rowcol()):
-		print("1 cell", cell.get_rowcol())
 		if is_valid_move(worker_1, cell):
 			return True
 	for cell in grid.get_adjacents(worker_2.get_rowcol()):
-		print("2 cell", cell.get_rowcol())
 		if is_valid_move(worker_2, cell):
 			return True
 	return False
@@ -297,8 +294,7 @@ def main():
 				if gamestate.phase == GameState.MIDGAME:
 					if not has_valid_moves(gamestate.current_player, grid):
 						gamestate.phase == GameState.GAMEOVER
-						gamestate.winner == gamestate.opposite_player(gamestate.current_player)
-						end_game(gamestate.winner)
+						end_game(gamestate.opposite_player(gamestate.current_player))
 					if command.stage == Command.SELECT_WORKER:
 						if grid.has_worker_at(row, col, gamestate.current_player):
 							command.from_cell = grid.get_cell(row, col)
@@ -309,8 +305,7 @@ def main():
 							grid.update_with_command(command)
 							if command.to_cell.has_winner():
 								gamestate.phase == GameState.GAMEOVER
-								gamestate.winner == command.to_cell.occupied_by
-								end_game(gamestate.winner)
+								end_game(gamestate.current_player)
 							command.next_stage()
 						else:
 							command = Command()
