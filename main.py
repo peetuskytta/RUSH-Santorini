@@ -187,8 +187,7 @@ def main():
 				sys.exit()
 			elif event.type == KEYDOWN:
 				if event.key == K_ESCAPE:
-					pygame.quit()
-					return
+					start_menu()
 			if event.type == pygame.MOUSEBUTTONUP:
 				pos = pygame.mouse.get_pos()
 				row, col = xy_to_rowcol(pos)
