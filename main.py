@@ -203,9 +203,6 @@ def start_menu():
 		mouse = pygame.mouse.get_pos()
 		pygame.display.update()
 
-def create_button():
-	pass
-
 def get_cell_color(occupied_by):
 	if occupied_by == 1:
 		return RED
@@ -216,6 +213,9 @@ def get_cell_color(occupied_by):
 
 def draw_grid(grid, gamestate):
 	smallfont = pygame.font.SysFont('Corbel',35)
+	largefont = pygame.font.SysFont('Corbel',100)
+	turn_text = largefont.render(str(gamestate.current_player), True, DARK)
+	SCREEN.blit(turn_text, (850, 200))
 	y = 0
 	for row in range(0, 5):
 		x = 0
@@ -296,7 +296,6 @@ def main():
 							workers_placed = 0
 				if gamestate.phase == GameState.MIDGAME:
 					if not has_valid_moves(gamestate.current_player, grid):
-						print("no moves left")
 						gamestate.phase == GameState.GAMEOVER
 						gamestate.winner == gamestate.opposite_player(gamestate.current_player)
 						end_game(gamestate.winner)
@@ -322,12 +321,6 @@ def main():
 							gamestate.next_turn()
 							command = Command()
 		pygame.display.update()
-
-#TODO
-# game over when no valid moves
-# game over text
-# new game after esc
-# placing worker on prev worker
 
 if __name__ == "__main__":
 	main()
