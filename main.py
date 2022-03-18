@@ -63,25 +63,23 @@ def start_menu():
 			if event.type == pygame.QUIT:
 				pygame.quit()
 			if event.type == pygame.MOUSEBUTTONDOWN:
-				if width/2 <= mouse[0] <= width/2+110 and height/2 <= mouse[1] <= height/2+40:
-					pygame.quit()
-				if width/2 <= mouse[0] <= width/2+110 and height/2-60 <= mouse[1] <= height/2+40:
+				x, y = pygame.mouse.get_pos()	
+				if x > 375 and x < 575 and y > 460 and y < 525:
 					return()
+				if x > 375 and x < 575 and y > 600 and y < 665:
+					pygame.quit()
 		SCREEN.blit(img, (0, 0))
 
 		mouse = pygame.mouse.get_pos()
-		if width/2 <= mouse[0] <= width/2+110 and height/2 <= mouse[1] <= height/2+40:
-			pygame.draw.rect(SCREEN, LIGHTER, [width/2, height/2, 110, 40])
-		else:
-			pygame.draw.rect(SCREEN, DARK, [width/2, height/2, 110, 40])
-		SCREEN.blit(q_button, (width/2+25, height/2))
-
-		SCREEN.blit(start_button, (width/2+25, height/2-60))
+#		if width/2 <= mouse[0] <= width/2+110 and height/2 <= mouse[1] <= height/2+40:
+#			pygame.draw.rect(SCREEN, (0, 0, 0),[385, 450, 200, 70])
+#		else:
+#			pygame.draw.rect(SCREEN, (0, 0, 0), [385, 600, 200, 70])
+#		SCREEN.blit(q_button, (width/2+25, height/2))
+#
+#		SCREEN.blit(start_button, (width/2+25, height/2-60))
 		pygame.display.update()
 
-# Creating a button to click and start game after names have been given
-# CARL!!?!?!? I think it's better to create a uniform button below that can be used all around the menu, right?
-# Right.
 def create_button():
 	pass
 
