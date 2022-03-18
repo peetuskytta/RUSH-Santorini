@@ -15,6 +15,10 @@ WHITE = (250, 250, 250)
 DARK = (100, 100, 100)
 LIGHTER = (50, 205, 140)
 
+class Player:
+	def __init__(self):
+		self.name = "Noname"
+
 class GameState:
 	PLACE_WORKERS = 0
 	MID_GAME = 1
@@ -23,6 +27,7 @@ class GameState:
 		self.phase = GameState.PLACE_WORKERS
 		self.number_of_players = 2
 		self.turn = 0
+		self.current_player = 1
 		#self.players == [Player(), Player()]
 
 class Cell:
@@ -128,7 +133,9 @@ def main():
 	start_menu()
 	SCREEN.fill(WHITE)
 	
+	workers_placed = 0
 	while True:
+		clicked = False
 		draw_grid(grid)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -141,7 +148,15 @@ def main():
 			if event.type == pygame.MOUSEBUTTONUP:
 				pos = pygame.mouse.get_pos()
 				row, col = xy_to_rowcol(pos)
-				grid.grid[row][col].occupied_by = 1
+				clicked = True
+		if clicked and gamestate.phase == GameState.PLACE_WORKERS:
+			grid.grid[row][col].occupied_by = gamestate.current_player
+			workers_placed += 1
+			if workers_placed == 2:
+				gamestate.turn += 1
+				gamestate.current_player = 2
+				workers_placed = 0
+
 
 
 		pygame.display.update()
