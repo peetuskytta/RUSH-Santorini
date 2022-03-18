@@ -3,17 +3,17 @@ from pygame.locals import *
 
 # Sizes in pixels
 WINDOW_HEIGHT = 750
-WINDOW_WIDTH = 750
+WINDOW_WIDTH = 950
 BLOCK_SIZE = 150
 res = (750, 750)
 
 # Colors
 GREEN = (50,205,50)
+RED = (205,50,50)
+BLUE = (50,50,205)
 WHITE = (250, 250, 250)
 DARK = (100, 100, 100)
 LIGHTER = (50, 205, 140)
-
-
 
 class GameState:
 	PLACE_WORKERS = 0
@@ -23,11 +23,12 @@ class GameState:
 		self.phase = GameState.PLACE_WORKERS
 		self.number_of_players = 2
 		self.turn = 0
+		#self.players == [Player(), Player()]
 
 class Cell:
-	EMPTY = 0
 	def __init__(self):
-		self.state = Cell.EMPTY
+		self.height = 0
+		self.occupied_by = 0
 
 class Grid:
 	def __init__(self):
@@ -37,7 +38,6 @@ class Grid:
 			for j in range(0, 5):
 				row.append(Cell())
 			self.grid.append(row)
-		print(self.grid)
 
 # Start menu which returns true until clicked START button
 def start_menu():
@@ -80,32 +80,56 @@ def start_menu():
 
 # Creating a button to click and start game after names have been given
 # CARL!!?!?!? I think it's better to create a uniform button below that can be used all around the menu, right?
+# Right.
 def create_button():
 	pass
 
-def draw_grid():
-	for x in range(0, WINDOW_WIDTH, BLOCK_SIZE):
-		for y in range(0, WINDOW_HEIGHT, BLOCK_SIZE):
-			rect = pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
-			pygame.draw.rect(SCREEN, WHITE, rect, 1)
+def get_cell_color(occupied_by):
+	if occupied_by == 1:
+		return RED
+	elif occupied_by == 2:
+		return BLUE
+	else:
+		return GREEN
+
+def draw_grid(grid):
+	smallfont = pygame.font.SysFont('Corbel',35)
+	y = 0
+	for row in range(0, 5):
+		x = 0
+		for col in range(0, 5):
+			cell = grid.grid[row][col]
+			color = get_cell_color(cell.occupied_by)
+			#rect = pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
+			surface = pygame.Surface((BLOCK_SIZE - 8, BLOCK_SIZE - 8))
+			surface.fill(color)
+			SCREEN.blit(surface, (x + 4, y + 4))
+			height_text = smallfont.render(str(cell.height), True, WHITE)
+			SCREEN.blit(height_text, (x + 75, y + 75))
+			#overlay = pygame.Surface((BLOCK_SIZE - 16, BLOCK_SIZE - 16))
+			#pygame.draw.rect(SCREEN, color, rect, 1)
+			x += BLOCK_SIZE
+		y += BLOCK_SIZE
+
+def xy_to_rowcol(xy):
+	x, y = xy
+	row = y // BLOCK_SIZE
+	col = x // BLOCK_SIZE
+	return (row, col)
 
 def main():
 	global SCREEN, CLOCK
-#	print("Enter team name:")
-#	name = input()
 	gamestate = GameState()
 	grid = Grid()
 	pygame.init()
 	SCREEN = pygame.display.set_mode(res)
-	SCREEN.fill((0, 0, 0))
-	#SCREEN.blit(background, (0, 0))
 	CLOCK = pygame.time.Clock()
 	
 	start_menu()
-	SCREEN.fill(GREEN)
+	SCREEN.fill(WHITE)
+	
 	while True:
-# IDK how to return after clicking START in menu... yet.
-		draw_grid()
+		draw_grid(grid)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
@@ -114,6 +138,11 @@ def main():
 				if event.key == K_ESCAPE:
 					pygame.quit()
 					return
+			if event.type == pygame.MOUSEBUTTONUP:
+				pos = pygame.mouse.get_pos()
+				row, col = xy_to_rowcol(pos)
+				grid.grid[row][col].occupied_by = 1
+
 
 		pygame.display.update()
 
