@@ -20,23 +20,18 @@ class Player:
 	def __init__(self):
 		self.name = "Noname"
 
-class Action(Enum):
-	NONE = 0
-	MOVE = 1
-	BUILD = 2
-
 class Command:
 	SELECT_WORKER = 0
-	CHOOSE_ACTION = 1
-	SELECT_CELL = 2
+	MOVE = 1
+	BUILD = 2
 	def __init__(self):
 		self.stage = Command.SELECT_WORKER
 		self.worker_cell = None
-		self.action = Action.NONE
 		self.cell = None
 
 	def next_stage(self):
 		self.stage += 1
+
 class GameState:
 	PLACE_WORKERS = 0
 	MIDGAME = 1
@@ -79,6 +74,8 @@ class Cell:
 		return False
 
 def is_valid_move(from_cell, to_cell):
+	if to_cell.height >= 4:
+		return False
 	if from_cell.occupied_by != 0:
 		return False
 	if to_cell.height > from_cell.height + 1:
@@ -87,8 +84,14 @@ def is_valid_move(from_cell, to_cell):
 		return False
 	return True
 
-def is_valid_build(self, build_cell, worker_cell, player):
-	pass
+def is_valid_build(build_cell, worker_cell):
+	if build_cell.occupied_by != 0:
+		return False
+	if build_cell.height >= 4:
+		return False
+	if not worker_cell.is_adjacent(build_cell):
+		return False
+	return True
 
 class Grid:
 	def __init__(self):
@@ -233,15 +236,19 @@ def main():
 					if command.stage == Command.SELECT_WORKER:
 						if grid.has_worker_at(row, col, gamestate.current_player):
 							command.worker_cell = grid.get_cell(row, col)
-							command.action = Action.MOVE
 							command.next_stage()
-							command.next_stage()
-					elif command.stage == Command.SELECT_CELL:
+					elif command.stage == Command.MOVE:
 						if is_valid_move(grid.get_cell(row, col), command.worker_cell):
 							command.cell = grid.get_cell(row, col)
 							grid.update_with_command(command)
-							command = Command()
+							command.next_stage()
+					elif command.stage == Command.BUILD:
+						build_cell = grid.get_cell(row, col)
+						if is_valid_build(build_cell, command.worker_cell):
+							build_cell.height += 1
 							gamestate.next_turn()
+							command = Command()
+
 
 		pygame.display.update()
 
