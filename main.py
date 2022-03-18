@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from enum import Enum
 
 # Sizes in pixels
 WINDOW_HEIGHT = 750
@@ -19,9 +20,26 @@ class Player:
 	def __init__(self):
 		self.name = "Noname"
 
+class Action(Enum):
+	NONE = 0
+	MOVE = 1
+	BUILD = 2
+
+class Command:
+	SELECT_WORKER = 0
+	CHOOSE_ACTION = 1
+	SELECT_CELL = 2
+	def __init__(self):
+		self.stage = Command.SELECT_WORKER
+		self.worker = None
+		self.action = Action.NONE
+		self.cell = None
+
+	def next_stage(self):
+		self.stage += 1
 class GameState:
 	PLACE_WORKERS = 0
-	MID_GAME = 1
+	MIDGAME = 1
 	GAMEOVER = 2
 	def __init__(self):
 		self.phase = GameState.PLACE_WORKERS
@@ -49,6 +67,23 @@ class Grid:
 			for j in range(0, 5):
 				row.append(Cell())
 			self.grid.append(row)
+	
+	def has_worker_at(self, row, col, current_player):
+		if self.grid[row][col].occupied_by == current_player:
+			return True
+		return False
+
+	def is_valid_move(self, row, col, current_player):
+		if self.grid[row][col].occupied_by == 0:
+			return True
+		return False
+
+	def update_with_command(self, command):
+		worker_row, worker_col, player = command.worker
+		new_row, new_col = command.cell
+		self.grid[worker_row][worker_col].occupied_by = 0
+		self.grid[new_row][new_col].occupied_by = player
+
 
 # Start menu which returns true until clicked START button
 def start_menu():
@@ -73,7 +108,7 @@ def start_menu():
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
-			if event.type == pygame.MOUSEBUTTONDOWN:
+			if event.type == pygame.MOUSEBUTTONUP:
 				x, y = pygame.mouse.get_pos()	
 				if x > 375 and x < 575 and y > 460 and y < 525:
 					return()
@@ -139,6 +174,7 @@ def main():
 	SCREEN.fill(WHITE)
 
 	workers_placed = 0
+	command = Command()
 	sidebar = pygame.image.load('sidebar.jpg')
 	img_sidebar = pygame.transform.scale(sidebar,(200,750))
 
@@ -161,7 +197,24 @@ def main():
 					workers_placed += 1
 					if workers_placed == 2:
 						gamestate.next_turn()
+						if gamestate.current_player == 1:
+							gamestate.phase = GameState.MIDGAME
 						workers_placed = 0
+				if gamestate.phase == GameState.MIDGAME:
+					if command.stage == Command.SELECT_WORKER:
+						if grid.has_worker_at(row, col, gamestate.current_player):
+							command.worker = (row, col, gamestate.current_player)
+							command.action = Action.MOVE
+							command.next_stage()
+							command.next_stage()
+					elif command.stage == Command.SELECT_CELL:
+						if grid.is_valid_move(row, col, gamestate.current_player):
+							command.cell = (row, col)
+							grid.update_with_command(command)
+							command = Command()
+							gamestate.next_turn()
+
+
 
 
 
