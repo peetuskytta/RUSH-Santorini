@@ -13,3 +13,9 @@ You can then run the game with `python3 main.py`.
 - Let the game begin.
 
 During gameplay pressing `ESC` will get you back to the start menu
+
+## Future features
+
+[ ] add images of construction phases (lvl 1,2,3,Dome)
+[ ] add Heroes
+[ ] add Gods
