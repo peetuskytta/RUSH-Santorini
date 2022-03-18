@@ -14,7 +14,6 @@ You can then run the game with `python3 main.py`.
 
 During gameplay pressing `ESC` will get you back to the start menu
 
-<<<<<<< HEAD
 ## Future features
 
 [ ] add images of construction phases (lvl 1,2,3,Dome)
@@ -23,4 +22,3 @@ During gameplay pressing `ESC` will get you back to the start menu
 =======
 <img width="300" alt="Screen Shot 2022-03-18 at 2 41 14 PM" src="https://user-images.githubusercontent.com/77061872/159004851-d7501173-3c4d-4c89-929c-0060c3b2feb3.png"> <img width="300" alt="Screen Shot 2022-03-18 at 2 41 25 PM" src="https://user-images.githubusercontent.com/77061872/159004967-359e039a-d441-4e97-a4f1-365af8fd342a.png">
 
->>>>>>> c9d842883afd363acc9a12467d39dc9540bd878e
