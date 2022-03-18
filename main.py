@@ -5,7 +5,7 @@ from pygame.locals import *
 WINDOW_HEIGHT = 750
 WINDOW_WIDTH = 750
 BLOCK_SIZE = 150
-res = (750, 750)
+RES = (950, 750)
 
 # Colors
 GREEN = (50,205,50)
@@ -43,7 +43,8 @@ class Grid:
 def start_menu():
 
 	# menu background
-	background = pygame.image.load('santorini_background.jpg')
+	background = pygame.image.load("santorini_menu.jpg")
+	img = pygame.transform.scale(background,(950, 750))
 
 	# Fonts
 	smallfont = pygame.font.SysFont('Corbel',35)
@@ -66,7 +67,7 @@ def start_menu():
 					pygame.quit()
 				if width/2 <= mouse[0] <= width/2+110 and height/2-60 <= mouse[1] <= height/2+40:
 					return()
-		SCREEN.blit(background, (0, 0))
+		SCREEN.blit(img, (0, 0))
 
 		mouse = pygame.mouse.get_pos()
 		if width/2 <= mouse[0] <= width/2+110 and height/2 <= mouse[1] <= height/2+40:
@@ -96,7 +97,7 @@ def main():
 	gamestate = GameState()
 	grid = Grid()
 	pygame.init()
-	SCREEN = pygame.display.set_mode(res)
+	SCREEN = pygame.display.set_mode(RES, RESIZABLE)
 	SCREEN.fill((0, 0, 0))
 	#SCREEN.blit(background, (0, 0))
 	CLOCK = pygame.time.Clock()
