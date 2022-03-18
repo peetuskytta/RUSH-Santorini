@@ -30,6 +30,12 @@ class GameState:
 		self.current_player = 1
 		#self.players == [Player(), Player()]
 
+	def next_turn(self):
+		self.turn += 1
+		self.current_player += 1
+		if self.current_player > self.number_of_players:
+			self.current_player = 1
+
 class Cell:
 	def __init__(self):
 		self.height = 0
@@ -129,7 +135,6 @@ def main():
 	grid = Grid()
 	pygame.init()
 	SCREEN = pygame.display.set_mode(RES, RESIZABLE)
-	#SCREEN.blit(background, (0, 0))
 	CLOCK = pygame.time.Clock()
 
 	start_menu()
@@ -140,7 +145,6 @@ def main():
 	img_sidebar = pygame.transform.scale(sidebar,(200,750))
 
 	while True:
-		clicked = False
 		draw_grid(grid)
 		SCREEN.blit(img_sidebar, (751, 0))
 		for event in pygame.event.get():
@@ -154,14 +158,12 @@ def main():
 			if event.type == pygame.MOUSEBUTTONUP:
 				pos = pygame.mouse.get_pos()
 				row, col = xy_to_rowcol(pos)
-				clicked = True
-		if clicked and gamestate.phase == GameState.PLACE_WORKERS:
-			grid.grid[row][col].occupied_by = gamestate.current_player
-			workers_placed += 1
-			if workers_placed == 2:
-				gamestate.turn += 1
-				gamestate.current_player = 2
-				workers_placed = 0
+				if gamestate.phase == GameState.PLACE_WORKERS:
+					grid.grid[row][col].occupied_by = gamestate.current_player
+					workers_placed += 1
+					if workers_placed == 2:
+						gamestate.next_turn()
+						workers_placed = 0
 
 
 
